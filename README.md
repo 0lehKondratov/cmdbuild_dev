@@ -1,4 +1,25 @@
 # cmdbuild_dev
+```
+docker rm $(docker ps -a -f status=exited -q)
+docker rmi $(docker images -a -q)
+docker volume prune
+```
+
+```bash
+docker volume rm cmdbuild-db
+docker volume rm cmdbuild-tomcat
+
+rm -rf /opt/cmdbuild/
+
+mkdir -p /opt/cmdbuild/cmdbuild-db
+mkdir -p /opt/cmdbuild/cmdbuild-tomcat
+
+docker volume rm cmdbuild-db
+docker volume rm cmdbuild-tomcat
+
+docker volume create --opt type=none --opt o=bind --opt device=/opt/cmdbuild/cmdbuild-db cmdbuild-db
+docker volume create --opt type=none --opt o=bind --opt device=/opt/cmdbuild/cmdbuild-tomcat cmdbuild-tomcat
+```
 
 ### Deploy by docker run
 **CMDbuild with demo database**  

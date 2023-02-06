@@ -11,9 +11,8 @@ services:
             - cmdbuild-db:/var/lib/postgresql
         ports:
             - 5432:5432
-        environment:
-            - POSTGRES_USER=postgres
-            - POSTGRES_PASS=postgres
+        env_file:
+          - config.env
         restart: always
         mem_limit: 1000m
         mem_reservation: 300m
@@ -30,13 +29,7 @@ services:
         restart: always
         volumes:
             - cmdbuild-tomcat:/usr/local/tomcat
-        environment:
-            - POSTGRES_USER=postgres
-            - POSTGRES_PASS=postgres
-            - POSTGRES_PORT=5432
-            - POSTGRES_HOST=cmdbuild_db
-            - POSTGRES_DB=cmdbuild_r2u2
-            - CMDBUILD_DUMP=demo.dump.xz
-            - JAVA_OPTS=-Xmx4000m -Xms2000m
+        env_file:
+          - config.env
         mem_limit: 4000m
         mem_reservation: 2000m
