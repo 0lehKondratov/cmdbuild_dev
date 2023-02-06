@@ -1,11 +1,11 @@
-version: "2.4"
+version: "3.9"
 volumes:
     cmdbuild-db:
     cmdbuild-tomcat:
 
 services:
     cmdbuild_db:
-        image: itmicus/cmdbuild:db-3.0
+        image: olehkondratov/cmdbuild:db-12
         container_name: cmdbuild_db
         volumes:
             - cmdbuild-db:/var/lib/postgresql
@@ -19,7 +19,7 @@ services:
         mem_reservation: 300m
 
     cmdbuild_app:
-        image: itmicus/cmdbuild:r2u-2.0-3.3
+        image: olehkondratov/ready2use-2.3-3.4.1:latest
         container_name: cmdbuild_app
         links:
            - cmdbuild_db

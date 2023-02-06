@@ -1,5 +1,5 @@
 # cmdbuild_dev
-git@github.com:itmicus/cmdbuild_docker.git
+
 ### Deploy by docker run
 **CMDbuild with demo database**  
 ```bash

@@ -1,10 +1,8 @@
-FROM tomcat:9.0.31-jdk11-openjdk
-
-MAINTAINER LLC Itmicus <order@itmicus.ru>
+FROM tomcat:9.0.71-jdk17-temurin-jammy
 
 WORKDIR $CATALINA_HOME
 
-ENV CMDBUILD_URL https://sourceforge.net/projects/cmdbuild/files/ready2use-2.0/Core%20updates/ready2use-2.0-3.3/ready2use-2.0-3.3.war/download
+ENV CMDBUILD_URL https://bootstrap.okd.okondratov.pl/cmdbuild-3.4.1.war
 ENV POSTGRES_USER postgres
 ENV POSTGRES_PASS postgres
 ENV POSTGRES_PORT 5432
@@ -31,7 +29,7 @@ RUN set -x \
 	&& groupadd tomcat \
 	&& useradd -s /bin/false -g tomcat -d $CATALINA_HOME tomcat \
 	&& cd /tmp \
-	&& wget -O cmdbuild.war "$CMDBUILD_URL" \
+	&& wget --no-check-certificate -O cmdbuild.war "$CMDBUILD_URL" \
 	&& chmod 777 cmdbuild.war \
 	&& chmod 777 /usr/local/bin/docker-entrypoint.sh \
 	&& unzip cmdbuild.war -d cmdbuild \
