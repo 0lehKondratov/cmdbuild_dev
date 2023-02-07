@@ -1,10 +1,12 @@
 # cmdbuild_dev
+
+###Remove images, containers, volumes
 ```
 docker rm $(docker ps -a -f status=exited -q)
 docker rmi $(docker images -a -q)
 docker volume prune
 ```
-
+Remove images, containers, volumes 
 ```bash
 docker volume rm cmdbuild-db
 docker volume rm cmdbuild-tomcat
@@ -16,7 +18,9 @@ mkdir -p /opt/cmdbuild/cmdbuild-tomcat
 
 docker volume rm cmdbuild-db
 docker volume rm cmdbuild-tomcat
-
+```
+### Create volume
+```bash
 docker volume create --opt type=none --opt o=bind --opt device=/opt/cmdbuild/cmdbuild-db cmdbuild-db
 docker volume create --opt type=none --opt o=bind --opt device=/opt/cmdbuild/cmdbuild-tomcat cmdbuild-tomcat
 ```

@@ -13,11 +13,12 @@ ENV CMDBUILD_DUMP ready2use_demo.dump.xz
 RUN apt-get update \
 	&& apt-get install -y --no-install-recommends \
     maven \
-	postgresql-client
+	postgresql-client unzip
 
 RUN set -x \
  	&& mkdir $CATALINA_HOME/conf/cmdbuild/ \
- 	&& mkdir $CATALINA_HOME/webapps/cmdbuild/
+ 	&& mkdir $CATALINA_HOME/webapps/cmdbuild/ \
+	&& mkdir $CATALINA_HOME/webapps/ROOT/
 
 COPY files/tomcat-users.xml $CATALINA_HOME/conf/tomcat-users.xml
 COPY files/context.xml $CATALINA_HOME/webapps/manager/META-INF/context.xml
