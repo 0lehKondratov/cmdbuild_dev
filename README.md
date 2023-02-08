@@ -28,14 +28,14 @@ docker volume create --opt type=none --opt o=bind --opt device=/opt/cmdbuild/cmd
 ### Deploy by docker run
 **CMDbuild with demo database**  
 ```bash
-docker run --name cmdbuild_db -p 5432:5432 -d itmicus/cmdbuild:db-3.0
+docker run --name cmdbuild_db -p 5432:5432 -d olehkondratov/cmdbuild:db-12
 docker run --name cmdbuild_app --link cmdbuild_db  -p 8090:8080 -d itmicus/cmdbuild:app-3.3
 ```
 
 **CMDbuild Ready2use 2.0**  
 ```bash  
-docker run --name cmdbuild_db -p 5432:5432 -d itmicus/cmdbuild:db-3.0
-docker run --name cmdbuild_app --restart unless-stopped -e CMDBUILD_DUMP="ready2use_demo.dump.xz" --link cmdbuild_db  -p 8090:8080 -d itmicus/cmdbuild:r2u-2.0-3.3
+docker run --name cmdbuild_db -p 5432:5432 -d itmicus/cmdbuild:db-12
+docker run --name cmdbuild_app --restart unless-stopped -e CMDBUILD_DUMP="ready2use_demo.dump.xz" --link cmdbuild_db  -p 8090:8080 -d  olehkondratov/ready2use-2.3-3.4.1:latest
 ```  
 
 #### CMDBUILD_DUMP values
