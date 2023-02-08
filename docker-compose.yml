@@ -2,10 +2,17 @@ version: "3.9"
 volumes:
     cmdbuild-db:
       external: true
+      driver:   local
     cmdbuild-tomcat:
       external: true
+      driver:   local
     pgadmin-data:
       external: true
+      driver:   local
+    grafana-data:
+      external: true
+      driver:   local
+
 
 services:
     cmdbuild_db:
@@ -34,7 +41,7 @@ services:
         depends_on:
            - cmdbuild_db
         ports:
-            - 8090:8080
+            - 8080:8080
         restart: always
         volumes:
             - cmdbuild-tomcat:/usr/local/tomcat
@@ -53,27 +60,100 @@ services:
         mem_reservation: 2000m
 
     pgadmin:
-      image: dpage/pgadmin4
-      container_name: pgadmin
-      restart: always
-      ports:
-        - "80:80"
-      environment:
-        PGADMIN_DEFAULT_EMAIL: admin@exea.pl
-        PGADMIN_DEFAULT_PASSWORD: admin
-        PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "True"
-    #    PGADMIN_CONFIG_LOGIN_BANNER: "Authorised users only!"
-        PGADMIN_CONFIG_CONSOLE_LOG_LEVEL: 10 
-      volumes:
-        - pgadmin-data:/var/lib/pgadmin
+        image: dpage/pgadmin4
+        container_name: pgadmin
+        restart: always
+        ports:
+          - "5050:80"
+        environment:
+            PGADMIN_DEFAULT_EMAIL: admin@exea.pl
+            PGADMIN_DEFAULT_PASSWORD: admin
+            PGADMIN_CONFIG_ENHANCED_COOKIE_PROTECTION: "True"
+    #       PGADMIN_CONFIG_LOGIN_BANNER: "Authorised users only!"
+            PGADMIN_CONFIG_CONSOLE_LOG_LEVEL: 10 
+        volumes:
+          - pgadmin-data:/var/lib/pgadmin
+
+#    prometheus:
+#        image: prom/prometheus
+#        container_name: prometheus
+#        ports:
+#            - 9060:9090
+#            - ./files/prometheus.yml:/etc/prometeus/prometheus.yml:ro
+#            - ./files/prometheus_ds.yml:/etc/grafana/provisioning/datasources/prometheus_ds.yml:ro
+
+    node_exporter:
+        image: quay.io/prometheus/node-exporter:latest
+        container_name: node_exporter
+        volumes:
+          - /proc:/host/proc:ro
+          - /sys:/host/sys:ro
+          - /:/rootfs:ro
+        command:
+          - '--path.procfs=/host/proc'
+          - '--path.rootfs=/rootfs'
+          - '--path.sysfs=/host/sys'
+          - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+        ports:
+          - 9100:9100
+        restart: unless-stopped 
+
+    postgres-exporter:
+        image: prometheuscommunity/postgres-exporter
+        container_name: postgres-exporter
+        ports:
+          - 9187:9187
+        environment:
+            DATA_SOURCE_NAME: "postgresql://postgres:postgres@cmdbuild_db:5432/shop?sslmode=disable"
+        links:
+          - cmdbuild_db
+#          - prometheus
 
     nginx:
       container_name: nginx
       links:
         - pgadmin:pgadmin
+        - cmdbuild_app:cmdbuild_app
+        - grafana:grafana
+#        - prometheus
       image: nginx:1.23
       ports:
-        - "5050:80"
+        - "80:80"
+        - "443:443"
       volumes:
-        - ./conf/nginx.conf:/etc/nginx/conf.d/default.conf
+
+        - ./files/nginx.conf:/etc/nginx/conf.d/default.conf:ro
+#        - ./files/grafana.conf:/etc/nginx/conf.d/grafana.conf:ro
+        - ./src:/usr/share/nginx/html
       restart: always
+
+#    nginx-exporter:
+#      image: nginx/nginx-prometheus-exporter
+#      container_name: nginx-exporter
+#      restart: unless-stopped
+#      environment:
+#        - SCRAPE_URI=http://nginx/nginx_status
+#        - TELEMETRY_PATH=/metrics
+#        - NGINX_RETRIES=10
+#      ports:
+#        - 9113:9113
+#      #networks:
+#      #  - frontend
+#      #mem_limit: 128m      # for docker-compose v2 only
+#      #mem_reservation: 64m # for docker-compose v2 only
+#      logging:
+#          driver: "json-file"
+#          options:
+#            max-size: "5m"
+
+    grafana:
+        image: grafana/grafana:9.3.6-ubuntu
+        container_name: grafana
+        ports:
+          - 3000:3000
+        restart: unless-stopped
+        volumes:
+          - ./files/grafana.ini:/etc/grafana/grafana.ini:ro
+#          - ./files/prometheus_ds.yml:/etc/grafana/provisioning/datasources/prometheus_ds.yml:ro
+          - grafana-data:/var/lib/grafana
+

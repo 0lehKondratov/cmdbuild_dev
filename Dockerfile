@@ -17,8 +17,8 @@ RUN apt-get update \
 
 RUN set -x \
  	&& mkdir $CATALINA_HOME/conf/cmdbuild/ \
- 	&& mkdir $CATALINA_HOME/webapps/cmdbuild/ \
-	&& mkdir $CATALINA_HOME/webapps/ROOT/
+ 	&& mkdir $CATALINA_HOME/webapps/cmdbuild/ 
+	#\	&& mkdir $CATALINA_HOME/webapps/ROOT/
 
 COPY files/tomcat-users.xml $CATALINA_HOME/conf/tomcat-users.xml
 COPY files/context.xml $CATALINA_HOME/webapps/manager/META-INF/context.xml
